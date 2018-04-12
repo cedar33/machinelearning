@@ -1,8 +1,20 @@
-import numpy as np
-import math
 
-def cond_ent_cal(x_list=[], y_list=[]):
-'''条件熵计算'''
+Skip to content
+This repository
+
+    Pull requests
+    Issues
+    Marketplace
+    Explore
+import numpy as np
+
+
+def cond_ent_cal(x_list=None, y_list=None):
+    """条件熵计算"""
+    if x_list is None:
+        x_list = []
+    if y_list is None:
+        y_list = []
     x_nparr = np.array(x_list)
     y_nparr = np.array(y_list)
     x_num = np.unique(x_nparr)
@@ -20,10 +32,12 @@ def cond_ent_cal(x_list=[], y_list=[]):
 #         print("cond_prob_nparr:", cond_prob_nparr)
         cond_ent_list.append(np.sum(-np.array(cond_prob_nparr)*np.log2(cond_prob_nparr)))
     return cond_ent_list
-    
-    
-def pos_pro_cal(property_list=[]):
-'''后验概率计算'''
+
+
+def pos_pro_cal(property_list=None):
+    """后验概率计算"""
+    if property_list is None:
+        property_list = []
     total = len(property_list)
     props = []
     pos_pro = []
@@ -32,10 +46,12 @@ def pos_pro_cal(property_list=[]):
             pos_pro.append(property_list.count(p)/total)
             props.append(p)
     return pos_pro
-    
-    
-def ent_cal(sample_list = []):
-'''熵计算'''
+
+
+def ent_cal(sample_list=None):
+    """熵计算"""
+    if sample_list is None:
+        sample_list = []
     prop_list_2 = []
     result_list = []
     p_prob_list_2 = []
@@ -43,9 +59,14 @@ def ent_cal(sample_list = []):
     cond_ent_list_2 = []
     cond_ent_list = []
     prob_list = []
-    for p, r in sample_list:
-        prop_list_2.append(p)
-        result_list.append(r)
+    try:
+        for p, r in sample_list:
+            result_list.append(r)
+            prop_list_2.append(p)
+    except ValueError:
+        for _s in sample_list[0]:
+            result_list.append(_s[1])
+            prop_list_2.append(_s[0])
     r_prob_list = pos_pro_cal(result_list)
     prop_list = np.array(prop_list_2).transpose()
     for props in prop_list:
@@ -63,14 +84,14 @@ def ent_cal(sample_list = []):
         prob_temp = np.where(y_nparr == r)[0].size/y_nparr.size
         prob_list.append(prob_temp)
     prob_nparr = np.array(prob_list)
-    prob_nparr[prob_nparr==0.0] = 0.00001
+    prob_nparr[prob_nparr == 0.0] = 0.00001
 #     print("prob_nparr:",prob_nparr)
     y_ent = np.sum(-prob_nparr*np.log2(prob_nparr))
     return cond_ent_list, y_ent
-    
+
 
 def tree_gen(sample=None, eps=0.2, tree=None):
-'''ID3方法生成决策树'''
+    """ID3方法生成决策树"""
     if sample is None:
         sample = []
     if tree is None:
@@ -99,5 +120,5 @@ def tree_gen(sample=None, eps=0.2, tree=None):
             sample_temp.append(np.array(sample)[np.where(x_nparr.transpose()[min_ent_index] == f)].tolist())
             for _s in sample_temp[0]:
                 sample_next.append((_s[0], _s[1]))
-            tree_gen(sample_next,tree = tree)
-    return tree
+            tree_gen(sample_next, tree=tree)
+        return tree
